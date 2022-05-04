@@ -1,0 +1,8 @@
+# Copy the same content as the .gitignore!
+.idea
+.mypy_cache
+.vscode
+__pycache__
+dist
+
+**/*.env

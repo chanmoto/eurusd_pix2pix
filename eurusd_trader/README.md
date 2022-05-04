@@ -1,0 +1,1 @@
+EUR_USD TRADER

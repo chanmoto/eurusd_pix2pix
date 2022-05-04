@@ -1,0 +1,30 @@
+version: '3.9'
+services:
+  mariadb:
+    image: mariadb:10.5.9
+    env_file:
+     - .env
+    ports:
+      - 3306:3306
+    volumes:
+     - database:/var/lib/mysql
+
+  adminer:
+    image: adminer:4.8.0
+    ports:
+      - 9999:8080
+
+  api:
+    image: nathansegers/bird-api-python
+    build:
+      context: api
+      dockerfile: Dockerfile
+    ports:
+      - 5000:80
+    depends_on:
+      - mariadb
+    env_file:
+      - .env
+
+volumes:
+  database:
