@@ -1,1 +1,1 @@
-"# eurusd_forex_vgg16" 
+EUR_USD TRADER
