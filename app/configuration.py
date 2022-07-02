@@ -32,3 +32,9 @@ class MachineLearningConfigurations:
         "result": result_dir,
         "val": val_dir
     }
+
+class IndicatorConfigurations:
+    st1 = 180
+    ed1 = 192
+    st2 = 192
+    ed2 = 204

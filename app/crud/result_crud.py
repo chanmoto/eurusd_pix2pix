@@ -6,8 +6,9 @@ from schemas.result_schema import Result as schema
 from sqlalchemy.orm import Session
 
 
-def select_all(db: Session) -> List[schema]:
-    return db.query(model).all()
+def select_all(db: Session, start:datetime , end : datetime) -> List[schema]:
+    return db.query(model).order_by(model.id.desc()).first()
+
 
 def select_by_id(
     db: Session,
@@ -28,9 +29,9 @@ def add(
 #if exists is not None, data will be updated.
     if exists:
         exists.id = obj.id
-        exists.realA = obj.realA
-        exists.realB = obj.realB
-        exists.fakeB = obj.fakeB
+        exists.reala = obj.reala
+        exists.realb = obj.realb
+        exists.fakeb = obj.fakeb
         exists.signal = obj.signal
         db.commit()
         return exists
@@ -39,9 +40,9 @@ def add(
     else:
         data=model(
             id=obj.id,
-            realA= obj.realA,
-            realB= obj.realB,
-            fakeB= obj.fakeB,
+            reala= obj.reala,
+            realb= obj.realb,
+            fakeb= obj.fakeb,
             signal= obj.signal,
         )
         db.add(data)
@@ -49,22 +50,6 @@ def add(
         db.refresh(data)
         return data
 
-"""
-def update_experiment_artifact_file_paths(
-    db: Session,
-    experiment_id: str,
-    artifact_file_paths: Dict,
-) -> schemas.Experiment:
-    data = select_experiment_by_id(
-        db=db,
-        experiment_id=experiment_id,
-    )
-    if data.artifact_file_paths is None:
-        data.artifact_file_paths = artifact_file_paths
-    else:
-        for k, v in artifact_file_paths.items():
-            data.artifact_file_paths[k] = v
-    db.commit()
-    db.refresh(data)
-    return data
-"""
+def get_result_span( db: Session, start_date:datetime,end_date:datetime ) -> List[schema]:
+    return db.query(model).distinct(model.id).filter(model.id <= end_date).filter(model.id >= start_date).order_by(model.id)
+    

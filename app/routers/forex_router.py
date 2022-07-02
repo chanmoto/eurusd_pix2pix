@@ -1,7 +1,7 @@
 from fastapi import Depends, Body, APIRouter
 from sqlalchemy.orm import Session
 from database import get_db
-from models.forex_model import Forex2_m5,Forex2_m30,Forex2_m240
+from models.forex_model import Forex_short,Forex_middle,Forex_long
 from datetime import datetime as dt
 from crud.forex_crud import get_last_time, add_forex
 from schemas import forex_schema as schema
@@ -22,9 +22,9 @@ def session_clear(exception):
 @router.get("/getlasttime/")
 async def gettime(db: Session = Depends(get_db),):
     return {
-        "m5": get_last_time(db=db,model=Forex2_m5),
-        "m30": get_last_time(db=db,model=Forex2_m30),
-        "m240": get_last_time(db=db,model=Forex2_m240)
+        "m5": get_last_time(db=db,model=Forex_short),
+        "m30": get_last_time(db=db,model=Forex_middle),
+        "m240": get_last_time(db=db,model=Forex_long)
     }
 
 @router.post("/gettick/")
@@ -43,11 +43,11 @@ async def gettick(
             volume= volume
     )
     if peristr == "forex_f1":
-        repo = Forex2_m5
+        repo = Forex_short
     elif peristr == "forex_f2":
-        repo = Forex2_m30
+        repo = Forex_middle
     elif peristr == "forex_f3":
-        repo = Forex2_m240
+        repo = Forex_long
     else:
         return {"error": "invalid peristr"}
     
@@ -63,4 +63,4 @@ async def gettick(
         session_clear(e)
         return {"error": "invalid data"}
 
-    return {"msg": "data posting comleted" }
+    return "data posting comleted" 

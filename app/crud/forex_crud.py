@@ -1,14 +1,9 @@
-from pyexpat import model
-from sqlalchemy import Column, Integer, Float, DateTime, func
-from database import Base
+from sqlalchemy import func
 from sqlalchemy.orm import Session
-from sqlalchemy_utils import get_class_by_table
 from sqlalchemy import desc
 from datetime import datetime
 from models import forex_model as model_
 from schemas import forex_schema as schema_
-from models.forex_model import Forex
-import pdb
 
 
 def get_last_time(db: Session,model:model_.Forex):
@@ -30,6 +25,14 @@ def get_dataframe(db: Session, framesize: int,model:model_.Forex):
         r = db.query(model).filter(
             model.id == q.c.id).order_by(model.id).all()
         return r
+    except:
+        pass
+
+
+def get_dataframe_date(db: Session, start:datetime , end : datetime, model:model_.Forex):
+    try:
+        q= db.query(model).filter(model.id.between(start, end)).order_by(model.id).all()
+        return q
     except:
         pass
 
@@ -106,4 +109,4 @@ def get_datafrom_endpoint(db: Session, models: list[model_.Forex],framesize: int
     for model in models:
         last_date = get_dataframe(db=db, framesize=framesize,model=model)
         date.append(last_date[-1].id)
-    return min(date)
+    return max(date)

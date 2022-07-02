@@ -9,7 +9,8 @@ import torch
 from pandas import DataFrame as df
 from PIL import Image
 from torchvision import transforms
-
+from configuration import IndicatorConfigurations as indc
+import pdb
 
 def getprice(img:List[Any], transform:Any, info:int,types:List[Any]):
     val={}
@@ -17,16 +18,19 @@ def getprice(img:List[Any], transform:Any, info:int,types:List[Any]):
         v = transform(Image.open(img[type]))
         v = v.numpy()
 
-        valueX = v[info, :, 0]
-        valueY = v[info, 0, :]
-        value = (valueX+valueY)/2
-        val[type] = min_max(value)
+        #valueX = v[info, :, 0]
+        valueXY = np.diag(v[info,:,:])
+        #valueY = v[info, 0, :]
+        #value = (valueX+valueY)/2
+        val[type] = min_max(valueXY)
+    #pdb.set_trace()
     return val, img['date']
 
-def GetSignal(item):
 
-    y1 = np.mean(item[162:192])
-    y2 = np.mean(item[192:222])
+def GetSignal(item,p:indc):
+
+    y1 = np.mean(item[p.st1:p.ed1])
+    y2 = np.mean(item[p.st2:p.ed2])
     return y2/y1
 
 
@@ -50,16 +54,13 @@ def imagemake(dfspan1: df,
 
     wsize = int(math.pow(2, int(math.log2(size))))
 
-    a = min_max(np.array([r.high for r in dfspan1]))
-    b = min_max(np.array([r.high for r in dfspan2]))
-    c = min_max(np.array([r.high for r in dfspan3]))
-    d = min_max(np.array([r.low for r in dfspan1]))
-    e = min_max(np.array([r.low for r in dfspan2]))
-    f = min_max(np.array([r.low for r in dfspan3]))
+    a = min_max(np.array([r.close for r in dfspan1]))
+    b = min_max(np.array([r.close for r in dfspan2]))
+    c = min_max(np.array([r.close for r in dfspan3]))
 
-    m = np.outer(a, d).astype(np.float32)
-    n = np.outer(b, e).astype(np.float32)
-    o = np.outer(c, f).astype(np.float32)
+    m = np.outer(a, a).astype(np.float32)
+    n = np.outer(b, b).astype(np.float32)
+    o = np.outer(c, c).astype(np.float32)
 
     m1 = min_max(m[0:wsize, 0:wsize])
     m2 = min_max(m[slide:wsize+slide, slide:wsize+slide])
@@ -79,26 +80,3 @@ def imagemake(dfspan1: df,
 
     return transforms.ToPILImage(mode='RGB')(tmp)
 
-def getprice2(img, transform):
-
-    try:
-        match = re.search(r'\d{4}-\d{2}-\d{2}', img['fakeB'])
-        date = datetime.datetime.strptime(match.group(), '%Y-%m-%d').date()
-        fake = transform(Image.open(img['fakeB']))
-        real = transform(Image.open(img['realB']))
-        fake = fake.numpy()
-        real = real.numpy()
-
-        reala = min_max(np.diag(real[0, :, :]))  # 対角成分
-        real1x = min_max(real[0, :, 0])
-        real1y = min_max(real[0, 0, :])
-        real2 = (reala+real1x+real1y)/3
-
-        fake1a = min_max(np.diag(fake[0, :, :]))  # 対角成分
-        fake1x = min_max(fake[0, :, 0])
-        fake1y = min_max(fake[0, 0, :])
-        fake2 = (fake1a+fake1x+fake1y)/3
-
-        return min_max(fake2), min_max(real2), img['date']
-    except:
-        return 0, 0, 0

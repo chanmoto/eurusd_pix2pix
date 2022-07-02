@@ -1,9 +1,5 @@
-from sqlalchemy import Column, Integer, Float, DateTime,func
+from sqlalchemy import Column, Integer, Float, DateTime
 from database import Base
-from sqlalchemy.orm import Session
-from sqlalchemy_utils import get_class_by_table
-from sqlalchemy import desc
-from datetime import datetime
 
 class Forex():
     __tablename__ = "forex"
@@ -15,11 +11,11 @@ class Forex():
     close = Column(Float)
     volume = Column(Integer)
 
-class Forex2_m5(Forex, Base):
-    __tablename__ = "forex2_m5"
+class Forex_short(Forex, Base):
+    __tablename__ = "forex_short"
 
-class Forex2_m30(Forex,Base):
-    __tablename__ = "forex2_m30"
+class Forex_middle(Forex,Base):
+    __tablename__ = "forex_middle"
 
-class Forex2_m240(Forex,Base):
-    __tablename__ = "forex2_m240"
+class Forex_long(Forex,Base):
+    __tablename__ = "forex_long"

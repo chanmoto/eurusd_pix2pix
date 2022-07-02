@@ -5,9 +5,9 @@ from typing import List, Dict, Optional
 
 class Result(BaseModel):
     id : datetime
-    realA: List[float]
-    realB: List[float]
-    fakeB: List[float]
+    reala: List[float]
+    realb: List[float]
+    fakeb: List[float]
     signal: float
  
     class Config:

@@ -11,17 +11,17 @@ class ResultBase(Base):
         primary_key=True,
         comment="datetime"
     )
-    realA = Column(
+    reala = Column(
         pg.ARRAY(Float),
-        comment="realA"
+        comment="reala"
     )
-    realB = Column(
+    realb = Column(
         pg.ARRAY(Float),
-        comment="realB"
+        comment="realb"
     )
-    fakeB = Column(
+    fakeb = Column(
         pg.ARRAY(Float),
-        comment="fakeB"
+        comment="fakeb"
     )
     signal = Column(
         Float,

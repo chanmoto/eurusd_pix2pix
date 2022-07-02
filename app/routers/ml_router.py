@@ -2,11 +2,12 @@ from enum import Enum
 from sqlalchemy.orm import Session
 from fastapi import APIRouter, Depends, Query
 from database import get_db
-from ml.pix2pix import image_set_ready, get_result_ready,plot_result_ready
+from ml.pix2pix import image_set_ready, get_result_ready,plot_result_ready_bb
 from ml.cmd import train, test
 from configuration import MachineLearningConfigurations as MLConfig
 import pdb
 from models.result_model import ResultBase 
+from datetime import datetime, timezone
 
 model = ResultBase()
 
@@ -61,7 +62,7 @@ count: 取得件数
 
 
 @router.get("/train/")
-async def get_train(
+def get_train(
     db: Session = Depends(get_db),
     param: str = Query("",
                        enum=["--continue", ""])
@@ -70,25 +71,32 @@ async def get_train(
 
 
 @router.get("/test/")
-async def get_test(
+def get_test(
     db: Session = Depends(get_db),
     phase: str = Query(list(MLConfig.paths.keys())[0],
-                       enum=list(MLConfig.paths.keys()))
+                       enum=list(MLConfig.paths.keys())),
+    number: int = 1
 ):
-    return {'msg': test(Phase=phase)}
+    print(phase)
+    return test(Phase=phase,number=number)
 
 @router.get("/result/")
-async def get_result(
+def get_result(
     db: Session = Depends(get_db),
     phase: str = Query(list(MLConfig.paths.keys())[0],
-                       enum=list(MLConfig.paths.keys()))
+                       enum=list(MLConfig.paths.keys())),
+                       info:int=0
 ):
-    return {'msg': get_result_ready(db=db,phase=phase)}
+    return get_result_ready(db=db,phase=phase,info=    info,shift=128)
 
 @router.get("/plot/")
 async def get_plot(
+    
     db: Session = Depends(get_db),
     phase: str = Query(list(MLConfig.paths.keys())[0],
-                       enum=list(MLConfig.paths.keys()))
+                       enum=list(MLConfig.paths.keys())),
+    start_date: datetime =datetime.now(timezone.utc),
+    end_date: datetime =datetime.now(timezone.utc)
+    
 ):
-    return {'msg': plot_result_ready(db=db,phase=phase)}
+    return {'msg': plot_result_ready_bb(db=db,phase=phase,start=start_date,end=end_date)}
